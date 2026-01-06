@@ -1,0 +1,511 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 32 30% 96%; /* Warmer off-white (noticeably less harsh) */
+  --foreground: 0 0% 0%; /* Black */
+  
+  /* surfaces should be clearly darker than the background in LIGHT mode */
+  --surface: 32 18% 86%;
+
+  --muted: 32 22% 92%;
+  --muted-foreground: 0 0% 45%;
+  
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  
+  /* Keep shadcn tokens in sync with our surface system */
+  --card: var(--surface);
+  --card-foreground: 0 0% 10%;
+  
+  --border: 0 0% 80%;
+  --input: 0 0% 80%;
+  
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 98%;
+  
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 9%;
+  
+  --accent: 0 0% 94%;
+  --accent-foreground: 0 0% 9%;
+  
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  
+  --ring: 0 0% 9%;
+  --radius: 1.25rem;
+}
+
+.dark {
+  --background: 0 0% 6%; /* Very Dark Gray (slightly lifted for comfort) */
+  --foreground: 0 0% 95%; /* Off White */
+  
+  /* Make surfaces clearly distinct from background in DARK mode */
+  --surface: 0 0% 12%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 60%;
+  
+  --popover: 0 0% 7%;
+  --popover-foreground: 0 0% 95%;
+  
+  --card: var(--surface);
+  --card-foreground: 0 0% 95%;
+  
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+  
+  --primary: 0 0% 95%;
+  --primary-foreground: 0 0% 5%;
+  
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 95%;
+  
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 95%;
+  
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 0 0% 95%;
+  
+  --ring: 0 0% 95%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen transition-colors duration-300;
+    font-family: var(--font-outfit), system-ui, -apple-system, sans-serif !important;
+  }
+
+  input, textarea, select {
+    @apply bg-transparent text-foreground placeholder:text-muted-foreground;
+  }
+}
+
+.header-scroll {
+  @apply bg-gradient-to-b from-white via-white/95 to-white/80 dark:from-[#0d0d0d] dark:via-[#0d0d0d]/95 dark:to-black/80 backdrop-blur-xl shadow-2xl border-b border-border/50;
+}
+
+.header-transparent {
+  @apply bg-transparent border-transparent shadow-none;
+}
+
+.shadow-premium {
+  @apply shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_40px_-15px_rgba(0,0,0,0.5)];
+}
+
+.shadow-hover {
+  @apply transition-all duration-500 ease-premium;
+}
+
+.shadow-hover:hover {
+  @apply shadow-[0_25px_60px_-15px_rgba(0,0,0,0.2)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] -translate-y-2;
+}
+
+.container-section {
+  @apply container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl;
+}
+
+.glass {
+  @apply bg-white/10 dark:bg-black/10 backdrop-blur-md border border-white/20 dark:border-white/5;
+}
+
+.title-pill {
+  @apply inline-flex items-center gap-2 rounded-full border border-primary/10 bg-primary/5 px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.25em] text-primary shadow-sm;
+}
+
+.gradient-bg {
+  @apply bg-gradient-to-br from-primary/5 via-transparent to-primary/5 dark:from-primary/10 dark:to-primary/10;
+}
+
+/* Unified surfaces (cards/containers) */
+.surface {
+  border-radius: 3rem;
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--border));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 24px 60px -38px rgba(0, 0, 0, 0.28);
+}
+
+.surface-soft {
+  border-radius: 3rem;
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--border));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 18px 45px -34px rgba(0, 0, 0, 0.22);
+}
+
+.surface-hover {
+  transition: transform 500ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.surface-hover:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    0 30px 70px -40px rgba(0, 0, 0, 0.35);
+}
+
+.dark .surface {
+  background: hsl(var(--surface));
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 35px 80px -45px rgba(0, 0, 0, 0.75);
+}
+
+.dark .surface-soft {
+  background: hsl(var(--surface));
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 28px 70px -45px rgba(0, 0, 0, 0.7);
+}
+
+/* Mesh / Wave backgrounds (stronger, works in light + dark) */
+.mesh-bg-light {
+  background:
+    radial-gradient(900px 500px at 10% 10%, rgba(0, 0, 0, 0.06), transparent 60%),
+    radial-gradient(700px 450px at 85% 20%, rgba(0, 0, 0, 0.05), transparent 55%),
+    radial-gradient(650px 520px at 30% 85%, rgba(0, 0, 0, 0.045), transparent 60%),
+    radial-gradient(800px 520px at 90% 90%, rgba(0, 0, 0, 0.04), transparent 60%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.035), rgba(0, 0, 0, 0));
+  background-color: hsl(var(--background));
+  background-repeat: no-repeat;
+}
+
+.mesh-bg-dark {
+  background:
+    radial-gradient(900px 500px at 10% 10%, rgba(255, 255, 255, 0.08), transparent 60%),
+    radial-gradient(700px 450px at 85% 20%, rgba(255, 255, 255, 0.07), transparent 55%),
+    radial-gradient(650px 520px at 30% 85%, rgba(255, 255, 255, 0.06), transparent 60%),
+    radial-gradient(800px 520px at 90% 90%, rgba(255, 255, 255, 0.05), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0));
+  background-color: #0d0d0d;
+  background-repeat: no-repeat;
+}
+
+@keyframes meshMove {
+  0% { background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 0% 0%; }
+  50% { background-position: 10% 5%, 92% 12%, 8% 92%, 88% 86%, 0% 0%; }
+  100% { background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 0% 0%; }
+}
+
+.mesh-animate {
+  animation: meshMove 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-animate { animation: none; }
+}
+
+/* 3D Inflated Buttons System (DRY - Single Source of Truth) */
+.btn-3d {
+  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow;
+}
+
+/* Light Mode - Primary Button (Dark Button on Light Background) */
+.btn-3d-primary {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 8px 16px -4px rgba(0, 0, 0, 0.25),
+    0 4px 8px -2px rgba(0, 0, 0, 0.15);
+}
+
+.btn-3d-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+    0 12px 24px -4px rgba(0, 0, 0, 0.35),
+    0 6px 12px -2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-3d-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.15);
+}
+
+/* Light Mode - Secondary/Outline Buttons */
+.btn-3d-secondary {
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  border: 1px solid hsl(var(--border));
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.08),
+    0 6px 12px -3px rgba(0, 0, 0, 0.15),
+    0 3px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.btn-3d-secondary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+    0 10px 20px -3px rgba(0, 0, 0, 0.2),
+    0 5px 10px -1px rgba(0, 0, 0, 0.12);
+}
+
+.btn-3d-secondary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.5),
+    0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Light Mode - Outline Button */
+.btn-3d-outline {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border: 2px solid hsl(var(--border));
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.05),
+    0 6px 12px -3px rgba(0, 0, 0, 0.12),
+    0 3px 6px -1px rgba(0, 0, 0, 0.08);
+}
+
+.btn-3d-outline:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: hsl(var(--primary));
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.95),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.08),
+    0 10px 20px -3px rgba(0, 0, 0, 0.18),
+    0 5px 10px -1px rgba(0, 0, 0, 0.1);
+}
+
+.btn-3d-outline:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.08),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.6),
+    0 2px 4px -1px rgba(0, 0, 0, 0.08);
+}
+
+/* Dark Mode - Primary Button (Light Button on Dark Background) */
+.dark .btn-3d-primary {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 8px 16px -4px rgba(0, 0, 0, 0.6),
+    0 4px 8px -2px rgba(0, 0, 0, 0.4);
+}
+
+.dark .btn-3d-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6),
+    0 12px 24px -4px rgba(0, 0, 0, 0.7),
+    0 6px 12px -2px rgba(0, 0, 0, 0.5);
+}
+
+.dark .btn-3d-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.08),
+    0 2px 4px -1px rgba(0, 0, 0, 0.5);
+}
+
+/* Dark Mode - Secondary/Outline Buttons */
+.dark .btn-3d-secondary {
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.08),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.4),
+    0 6px 12px -3px rgba(0, 0, 0, 0.5),
+    0 3px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.dark .btn-3d-secondary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 10px 20px -3px rgba(0, 0, 0, 0.6),
+    0 5px 10px -1px rgba(0, 0, 0, 0.4);
+}
+
+.dark .btn-3d-secondary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark Mode - Outline Button */
+.dark .btn-3d-outline {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.05),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 6px 12px -3px rgba(0, 0, 0, 0.4),
+    0 3px 6px -1px rgba(0, 0, 0, 0.25);
+}
+
+.dark .btn-3d-outline:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: hsl(var(--primary));
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.08),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+    0 10px 20px -3px rgba(0, 0, 0, 0.5),
+    0 5px 10px -1px rgba(0, 0, 0, 0.3);
+}
+
+.dark .btn-3d-outline:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.25),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.03),
+    0 2px 4px -1px rgba(0, 0, 0, 0.3);
+}
+
+/* 3D Inset Input Fields System (DRY - Depressed/Hollow Effect) */
+.input-3d {
+  position: relative;
+  transition: all 250ms cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: box-shadow;
+}
+
+/* Light Mode - Input Fields (Inset/Depressed) */
+.input-3d {
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.12),
+    inset 0 1px 2px rgba(0, 0, 0, 0.08),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.input-3d:focus {
+  border-color: hsl(var(--primary));
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.15),
+    inset 0 1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 0 3px hsl(var(--primary) / 0.1);
+}
+
+.input-3d:hover:not(:focus):not(:disabled) {
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.14),
+    inset 0 1px 2px rgba(0, 0, 0, 0.09),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.input-3d:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark Mode - Input Fields (Inset/Depressed) */
+.dark .input-3d {
+  background: hsl(var(--background));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.5),
+    inset 0 1px 2px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.dark .input-3d:focus {
+  border-color: hsl(var(--primary));
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.6),
+    inset 0 1px 2px rgba(0, 0, 0, 0.4),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.04),
+    0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 3px hsl(var(--primary) / 0.2);
+}
+
+.dark .input-3d:hover:not(:focus):not(:disabled) {
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.55),
+    inset 0 1px 2px rgba(0, 0, 0, 0.35),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.dark .input-3d:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+/* 3D Circular Size Selection */
+.size-circle {
+  @apply flex h-14 w-14 items-center justify-center rounded-full text-xs font-extrabold uppercase tracking-widest transition-all duration-500;
+  @apply border-2 border-border bg-background shadow-sm hover:border-primary/40 hover:scale-110 active:scale-95 cursor-pointer;
+}
+
+.size-circle-active {
+  @apply border-primary bg-primary text-primary-foreground scale-110;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    0 10px 20px -5px rgba(0, 0, 0, 0.4);
+}
+
+.size-circle-disabled {
+  @apply opacity-30 cursor-not-allowed border-dashed grayscale pointer-events-none;
+  background-image: linear-gradient(45deg, transparent 48%, rgba(239, 68, 68, 0.5) 48%, rgba(239, 68, 68, 0.5) 52%, transparent 52%);
+}
+
+/* Premium 3D Qty Selector */
+.premium-qty-container {
+  @apply flex items-center justify-between h-16 rounded-2xl p-1.5 input-3d;
+}
+
+.qty-btn-3d {
+  @apply flex h-full aspect-square items-center justify-center rounded-xl transition-all duration-300;
+  @apply text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:shadow-lg active:scale-90;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
+}
