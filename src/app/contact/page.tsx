@@ -91,7 +91,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-muted-foreground mb-1">Call Us</p>
-                <p className="text-lg font-bold">+47 21 00 00 00</p>
+                <p className="text-lg font-bold">+963 942 090 950</p>
               </div>
             </div>
           </div>
