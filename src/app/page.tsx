@@ -10,12 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ProductCard, ProductCardSkeleton } from "@/features/shop/components/product-card";
 import { useProducts } from "@/features/shop/hooks/use-products";
+import { useBrands } from "@/features/shop/hooks/use-brands";
 import { SectionHeader } from "@/components/ui/section-header";
 import { cn } from "@/lib/utils";
 import { Stack } from "@/components/ui/stack";
 
 export default function HomePage() {
   const { products, isLoading: loadingProducts } = useProducts({ sort: "featured" });
+  const { data: brands = [], isLoading: loadingBrands } = useBrands();
 
   const categoryImages: Record<string, string> = {
     // Local placeholders (avoid upstream 404s & reduce dev CPU/network)
@@ -238,6 +240,67 @@ export default function HomePage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Brands Section */}
+      <section className="container-section">
+        <SectionHeader 
+          title="Our Brands" 
+          subtitle="Trusted Partners" 
+          icon={HiOutlineTag}
+          align="center"
+        />
+        
+        {loadingBrands ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mt-16">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div key={idx} className="aspect-square rounded-2xl bg-muted/50 animate-pulse" />
+            ))}
+          </div>
+        ) : brands.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mt-16">
+              {brands.slice(0, 6).map((brand) => (
+                <motion.div
+                  key={brand.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="group"
+                >
+                  <Link 
+                    href={`/shop?brand=${brand.id}`}
+                    className="relative block aspect-square rounded-2xl overflow-hidden bg-muted/30 border border-border/50 hover:border-primary/50 transition-all duration-500 hover:shadow-lg hover:shadow-primary/10"
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center p-6">
+                      <h3 className="text-center text-sm sm:text-base font-extrabold uppercase tracking-tight text-foreground group-hover:text-primary transition-colors">
+                        {brand.name}
+                      </h3>
+                    </div>
+                    {brand.photo && (
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 bg-primary" />
+                    )}
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+            
+            {brands.length > 6 && (
+              <div className="flex justify-center pt-12">
+                <Button variant="ghost" asChild className="group h-14 rounded-full px-10 text-[11px] font-extrabold uppercase tracking-[0.4em] text-foreground hover:bg-primary/5 hover:text-primary transition-all">
+                  <Link href="/shop" className="flex items-center gap-3">
+                    View All Brands <HiOutlineArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-3" />
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-16">
+            <p className="text-muted-foreground text-sm uppercase tracking-widest">No brands available</p>
+          </div>
+        )}
       </section>
 
       {/* Newsletter - Mesh background (light + dark) */}

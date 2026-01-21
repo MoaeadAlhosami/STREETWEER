@@ -1,33 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useAuthStore } from "@/store/auth-store";
+import { useRegister } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
 import { HiOutlineSparkles } from "react-icons/hi2";
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const { login } = useAuthStore();
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const registerMutation = useRegister();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    
-    // Mock register
-    setTimeout(() => {
-      login({ id: "1", name: "STREETWEER User", email: "user@streetweer.com" });
-      setLoading(false);
-      toast({ title: "Welcome!", description: "Account created successfully." });
-      router.push("/");
-    }, 1000);
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const password_confirmation = formData.get("password_confirmation") as string;
+
+    registerMutation.mutate({
+      name,
+      email,
+      password,
+      password_confirmation,
+    });
   };
 
   return (
@@ -49,18 +46,22 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-3">
             <Label htmlFor="name" className="text-[10px] font-extrabold uppercase tracking-[0.3em] ml-4 text-foreground/40">Full Name</Label>
-            <Input id="name" placeholder="ALEX SMITH" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground placeholder:text-foreground/20 focus:border-primary/20 transition-all font-bold tracking-widest uppercase text-[11px] shadow-inner" />
+            <Input id="name" name="name" placeholder="ALEX SMITH" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground placeholder:text-foreground/20 focus:border-primary/20 transition-all font-bold tracking-widest uppercase text-[11px] shadow-inner" />
           </div>
           <div className="space-y-3">
             <Label htmlFor="email" className="text-[10px] font-extrabold uppercase tracking-[0.3em] ml-4 text-foreground/40">Email Address</Label>
-            <Input id="email" type="email" placeholder="ALEX@EXAMPLE.COM" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground placeholder:text-foreground/20 focus:border-primary/20 transition-all font-bold tracking-widest uppercase text-[11px] shadow-inner" />
+            <Input id="email" name="email" type="email" placeholder="ALEX@EXAMPLE.COM" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground placeholder:text-foreground/20 focus:border-primary/20 transition-all font-bold tracking-widest uppercase text-[11px] shadow-inner" />
           </div>
           <div className="space-y-3">
             <Label htmlFor="password" className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-foreground/40">Password</Label>
-            <Input id="password" type="password" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground focus:border-primary/20 transition-all font-bold shadow-inner" />
+            <Input id="password" name="password" type="password" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground focus:border-primary/20 transition-all font-bold shadow-inner" />
           </div>
-          <Button type="submit" className="w-full h-16 rounded-2xl text-[11px] font-extrabold uppercase tracking-[0.35em] bg-primary text-primary-foreground shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all" disabled={loading}>
-            {loading ? "Creating..." : "Create Account"}
+          <div className="space-y-3">
+            <Label htmlFor="password_confirmation" className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-foreground/40">Confirm Password</Label>
+            <Input id="password_confirmation" name="password_confirmation" type="password" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground focus:border-primary/20 transition-all font-bold shadow-inner" />
+          </div>
+          <Button type="submit" className="w-full h-16 rounded-2xl text-[11px] font-extrabold uppercase tracking-[0.35em] bg-primary text-primary-foreground shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all" disabled={registerMutation.isPending}>
+            {registerMutation.isPending ? "Creating..." : "Create Account"}
           </Button>
         </form>
 

@@ -1,36 +1,28 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useAuthStore } from "@/store/auth-store";
+import { useLogin } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
 import { HiOutlineArrowLeftOnRectangle } from "react-icons/hi2";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useAuthStore();
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const loginMutation = useLogin();
   
   const redirect = searchParams.get("redirect") || "/";
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    
-    // Mock login
-    setTimeout(() => {
-      login({ id: "1", name: "STREETWEER User", email: "user@streetweer.com" });
-      setLoading(false);
-      toast({ title: "Welcome back!", description: "Logged in successfully." });
-      router.push(redirect);
-    }, 1000);
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    loginMutation.mutate({ email, password });
   };
 
   return (
@@ -52,17 +44,17 @@ function LoginForm() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-3">
             <Label htmlFor="email" className="text-[10px] font-extrabold uppercase tracking-[0.3em] ml-4 text-foreground/40">Email Address</Label>
-            <Input id="email" type="email" placeholder="ALEX@EXAMPLE.COM" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground placeholder:text-foreground/20 focus:border-primary/20 transition-all font-bold tracking-widest uppercase text-[11px] shadow-inner" />
+            <Input id="email" name="email" type="email" placeholder="ALEX@EXAMPLE.COM" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground placeholder:text-foreground/20 focus:border-primary/20 transition-all font-bold tracking-widest uppercase text-[11px] shadow-inner" />
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between px-4">
               <Label htmlFor="password" className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-foreground/40">Password</Label>
               <Link href="#" className="text-[9px] font-extrabold uppercase tracking-widest text-primary hover:underline">Forgot Password?</Link>
             </div>
-            <Input id="password" type="password" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground focus:border-primary/20 transition-all font-bold shadow-inner" />
+            <Input id="password" name="password" type="password" required className="h-16 rounded-2xl border-border bg-muted/50 px-8 text-foreground focus:border-primary/20 transition-all font-bold shadow-inner" />
           </div>
-          <Button type="submit" className="w-full h-16 rounded-2xl text-[11px] font-extrabold uppercase tracking-[0.35em] bg-primary text-primary-foreground shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all" disabled={loading}>
-            {loading ? "Authenticating..." : "Sign In"}
+          <Button type="submit" className="w-full h-16 rounded-2xl text-[11px] font-extrabold uppercase tracking-[0.35em] bg-primary text-primary-foreground shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all" disabled={loginMutation.isPending}>
+            {loginMutation.isPending ? "Authenticating..." : "Sign In"}
           </Button>
         </form>
 

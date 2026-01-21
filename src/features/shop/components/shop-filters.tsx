@@ -15,7 +15,8 @@ import {
 import { ProductFilters, SortOption } from "../hooks/use-products";
 
 interface Props {
-  categories: string[];
+  categories: string[] | { id: string | number; name: string }[];
+  brands?: { id: string | number; name: string }[];
   onChange: (filters: ProductFilters) => void;
   filters: ProductFilters;
 }
@@ -27,15 +28,25 @@ const sortOptions: { label: string; value: SortOption }[] = [
   { label: "Newest Arrivals", value: "newest" },
 ];
 
-export function ShopFilters({ categories, onChange, filters }: Props) {
-  const categoryItems = useMemo(
-    () => ["All Collections", ...categories],
-    [categories],
-  );
+export function ShopFilters({ categories, brands, onChange, filters }: Props) {
+  const categoryItems = useMemo(() => {
+    if (!categories || !Array.isArray(categories) || categories.length === 0) {
+      return ["All Collections"];
+    }
+    const cats = categories.map((cat) => 
+      typeof cat === "string" ? cat : cat.name
+    );
+    return ["All Collections", ...cats];
+  }, [categories]);
+
+  const brandItems = useMemo(() => {
+    if (!brands || !Array.isArray(brands) || brands.length === 0) return [];
+    return ["All Brands", ...brands.map((brand) => brand.name)];
+  }, [brands]);
 
   return (
     <div className="surface-soft p-12">
-      <div className="grid gap-8 md:grid-cols-3 lg:grid-cols-4 items-end">
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 items-end">
         {/* Search */}
         <div className="space-y-3 md:col-span-2 lg:col-span-1">
           <label className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-foreground/40 ml-4">Search Catalog</label>
@@ -54,7 +65,7 @@ export function ShopFilters({ categories, onChange, filters }: Props) {
         <div className="space-y-3">
           <label className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-foreground/40 ml-4">Collection</label>
           <Select
-            value={filters.category ?? "All Collections"}
+            value={filters.category ? String(filters.category) : "All Collections"}
             onValueChange={(value) =>
               onChange({
                 ...filters,
@@ -66,14 +77,48 @@ export function ShopFilters({ categories, onChange, filters }: Props) {
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent className="rounded-2xl border-border shadow-2xl">
-              {categoryItems.map((category) => (
-                <SelectItem key={category} value={category} className="rounded-xl my-1 focus:bg-muted/50 text-[11px] font-extrabold uppercase tracking-widest py-3">
-                  {category}
-                </SelectItem>
-              ))}
+              {categoryItems.map((category, index) => {
+                const categoryValue = index === 0 
+                  ? "All Collections" 
+                  : (typeof categories[index - 1] === "string" 
+                      ? categories[index - 1] 
+                      : String(categories[index - 1]?.id || categories[index - 1]?.name));
+                return (
+                  <SelectItem key={category} value={categoryValue} className="rounded-xl my-1 focus:bg-muted/50 text-[11px] font-extrabold uppercase tracking-widest py-3">
+                    {category}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
+
+        {/* Brand */}
+        {brands && brands.length > 0 && (
+          <div className="space-y-3">
+            <label className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-foreground/40 ml-4">Brand</label>
+            <Select
+              value={filters.brand ? String(filters.brand) : "All Brands"}
+              onValueChange={(value) =>
+                onChange({
+                  ...filters,
+                  brand: value === "All Brands" ? undefined : value,
+                })
+              }
+            >
+              <SelectTrigger className="h-14 rounded-2xl border-border bg-muted/50 shadow-sm hover:border-primary/20 transition-all text-foreground font-extrabold uppercase text-[11px] tracking-widest px-6">
+                <SelectValue placeholder="Brand" />
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl border-border shadow-2xl">
+                {brandItems.map((brand) => (
+                  <SelectItem key={brand} value={brand === "All Brands" ? "All Brands" : String(brands.find(b => b.name === brand)?.id)} className="rounded-xl my-1 focus:bg-muted/50 text-[11px] font-extrabold uppercase tracking-widest py-3">
+                    {brand}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {/* Sort */}
         <div className="space-y-3">

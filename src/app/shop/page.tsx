@@ -12,10 +12,13 @@ import { ShopFilters } from "@/features/shop/components/shop-filters";
 import {
   ProductFilters,
   SortOption,
-  useCategories,
   useProducts,
 } from "@/features/shop/hooks/use-products";
+import { useCategories } from "@/features/shop/hooks/use-categories";
+import { useBrands } from "@/features/shop/hooks/use-brands";
 import { SectionHeader } from "@/components/ui/section-header";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const PAGE_SIZE = 12;
 
@@ -50,6 +53,7 @@ function ShopContent() {
   const [showFilters, setShowFilters] = useState(true);
 
   const { data: categories = [], isLoading: loadingCategories } = useCategories();
+  const { data: brands = [], isLoading: loadingBrands } = useBrands();
   const { products, isLoading } = useProducts(filters);
 
   useEffect(() => {
@@ -116,12 +120,65 @@ function ShopContent() {
           >
             <ShopFilters
               categories={categories}
+              brands={brands}
               filters={filters}
               onChange={handleFiltersChange}
             />
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Brands Section */}
+      {brands.length > 0 && (
+        <section className="space-y-8">
+          <SectionHeader 
+            title="Shop by Brand" 
+            subtitle="Featured Brands" 
+            icon={HiOutlineAdjustmentsHorizontal}
+            align="center"
+          />
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {loadingBrands ? (
+              Array.from({ length: 6 }).map((_, idx) => (
+                <div key={idx} className="aspect-square rounded-2xl bg-muted/50 animate-pulse" />
+              ))
+            ) : (
+              brands.map((brand) => (
+                <motion.div
+                  key={brand.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3 }}
+                  className="group"
+                >
+                  <Link 
+                    href={`/shop?brand=${brand.id}`}
+                    className={cn(
+                      "relative block aspect-square rounded-2xl overflow-hidden border transition-all duration-500",
+                      filters.brand === String(brand.id)
+                        ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                        : "border-border/50 bg-muted/30 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10"
+                    )}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center p-4">
+                      <h3 className={cn(
+                        "text-center text-xs sm:text-sm font-extrabold uppercase tracking-tight transition-colors",
+                        filters.brand === String(brand.id)
+                          ? "text-primary"
+                          : "text-foreground group-hover:text-primary"
+                      )}>
+                        {brand.name}
+                      </h3>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))
+            )}
+          </div>
+        </section>
+      )}
 
       <div className="grid gap-x-6 gap-y-12 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {isLoading &&
@@ -160,7 +217,7 @@ function ShopContent() {
         </div>
       )}
 
-      {(isLoading || loadingCategories) && (
+      {(isLoading || loadingCategories || loadingBrands) && (
         <div className="flex justify-center pt-12">
           <Loader className="h-10 w-10" />
         </div>

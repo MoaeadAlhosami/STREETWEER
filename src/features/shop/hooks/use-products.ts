@@ -1,16 +1,17 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getCategories, getProduct, getProducts } from "../services/products";
+import { getProduct, getProducts } from "../services/products";
 import { queryKeys } from "@/lib/query-keys";
 import { Product } from "@/types/product";
 
 export type SortOption = "featured" | "price-asc" | "price-desc" | "newest";
 
 export interface ProductFilters {
-  category?: string;
+  category?: string | number;
   size?: string;
   query?: string;
   sort?: SortOption;
+  brand?: string | number;
 }
 
 const filterProducts = (products: Product[], filters: ProductFilters) => {
@@ -19,10 +20,19 @@ const filterProducts = (products: Product[], filters: ProductFilters) => {
   let list = [...products];
 
   if (filters.category) {
-    list = list.filter(
-      (product) =>
-        product.category.toLowerCase() === filters.category?.toLowerCase(),
-    );
+    list = list.filter((product) => {
+      const productCategory = product.category;
+      if (typeof productCategory === "string") {
+        return productCategory.toLowerCase() === String(filters.category).toLowerCase();
+      }
+      return String(productCategory) === String(filters.category);
+    });
+  }
+
+  if (filters.brand) {
+    list = list.filter((product) => {
+      return String(product.brand_id) === String(filters.brand);
+    });
   }
 
   if (filters.size) {
@@ -31,24 +41,37 @@ const filterProducts = (products: Product[], filters: ProductFilters) => {
 
   if (normalizedQuery) {
     list = list.filter(
-      (product) =>
-        product.title.toLowerCase().includes(normalizedQuery) ||
-        product.description.toLowerCase().includes(normalizedQuery),
+      (product) => {
+        const title = product.title || product.name || "";
+        const description = product.description || "";
+        return (
+          title.toLowerCase().includes(normalizedQuery) ||
+          description.toLowerCase().includes(normalizedQuery)
+        );
+      }
     );
   }
 
   switch (filters.sort) {
     case "price-asc":
-      list = list.sort((a, b) => a.price - b.price);
+      list = list.sort((a, b) => (a.price || a.base_price || 0) - (b.price || b.base_price || 0));
       break;
     case "price-desc":
-      list = list.sort((a, b) => b.price - a.price);
+      list = list.sort((a, b) => (b.price || b.base_price || 0) - (a.price || a.base_price || 0));
       break;
     case "newest":
-      list = list.sort((a, b) => Number(b.status === "new") - Number(a.status === "new"));
+      list = list.sort((a, b) => {
+        const aNew = a.status === "new" || a.status === 1;
+        const bNew = b.status === "new" || b.status === 1;
+        return Number(bNew) - Number(aNew);
+      });
       break;
     default:
-      list = list.sort((a, b) => Number(b.status === "featured") - Number(a.status === "featured"));
+      list = list.sort((a, b) => {
+        const aFeatured = a.is_feature || a.status === "featured";
+        const bFeatured = b.is_feature || b.status === "featured";
+        return Number(bFeatured) - Number(aFeatured);
+      });
   }
 
   return list;
@@ -58,6 +81,7 @@ export const useProducts = (filters: ProductFilters = {}) => {
   const query = useQuery({
     queryKey: queryKeys.products,
     queryFn: getProducts,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const filtered = useMemo(() => {
@@ -68,16 +92,10 @@ export const useProducts = (filters: ProductFilters = {}) => {
   return { ...query, products: filtered };
 };
 
-export const useProduct = (id: string) =>
+export const useProduct = (id: string | number) =>
   useQuery({
     queryKey: queryKeys.product(id),
     queryFn: () => getProduct(id),
     enabled: Boolean(id),
-  });
-
-export const useCategories = () =>
-  useQuery({
-    queryKey: queryKeys.categories,
-    queryFn: getCategories,
   });
 
